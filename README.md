@@ -1,62 +1,63 @@
-# [Project title]
+# URL Shortener with Analytics
 
-[One paragraph: what this program does and who would use it. Replace this
-whole file — it is your project's front door, and it is marked.]
+A small HTTP service that turns long HTTP or HTTPS addresses into short links. It supports custom codes, redirects, visit counts, link statistics, listing, and deletion. The current version keeps its data in memory, so links and analytics reset when the service restarts.
 
-- **Student:** [Surname Firstname], group [group]
-- **Project:** [number and title from the project description]
+- **Student:** Campan Alexandru, group and student ID to be completed
+- **Project:** 1 — URL Shortener with Analytics
 - **Language:** Go
 
-## What it does
+## Features
 
-[Two or three paragraphs. What problem it solves, what it does not do, and
-what state it is in.]
+- Create a link with an optional custom code (`POST /links`).
+- Redirect from `/{code}` and record the visit.
+- List links (`GET /links`) and inspect analytics (`GET /links/{code}/stats`).
+- Delete a link (`DELETE /links/{code}`).
+- Common service routes: `/`, `/health`, `/version`, and `POST /reset`.
+- Validate destination URLs and custom codes; return JSON errors for invalid or missing resources.
 
-## How to run it
+The current storage is an in-memory map protected for concurrent access. Data does not survive a process restart. Persistent storage and additional analytics are future work.
 
-```
-docker run --rm -p 8080:8080 ghcr.io/[user]/[repo]:latest
-```
+## Run locally
 
-To build and run without Docker:
+Requires Go 1.27 or newer.
 
-```
+```sh
 go run ./cmd/app
+```
+
+The server listens on `http://localhost:8080`. To check it, open that address or run:
+
+```sh
+curl http://localhost:8080/health
+```
+
+To print build information:
+
+```sh
 go run ./cmd/app --version
 ```
 
-## What you should see
+## Create and use a short link
 
-[What a successful run looks like. If it is a service, one request and its
-response. If it is a tool, one command and its output. A reader who has never
-seen your project must be able to tell whether it worked.]
+```sh
+curl -i -X POST http://localhost:8080/links \
+  -H 'Content-Type: application/json' \
+  -d '{"url":"https://go.dev/doc/effective_go","code":"gofmt"}'
 
----
+curl -i http://localhost:8080/gofmt
+curl http://localhost:8080/links/gofmt/stats
+```
 
-## Before you delete these notes
+Omit `code` to have the service generate one. Custom codes must contain 4–10 letters, digits, hyphens, or underscores. Destinations must be absolute `http` or `https` URLs.
 
-**Fill in `atad.json` first.** Name, group, student id, email, project number
-and title, language, and the command that runs your project. The marking script reads this file. A field left as
-`[placeholder]` counts as missing.
+## Run the published container
 
-**`--version` is part of the contract.** It must print one line of JSON with
-`app`, `version`, `commit` and `built_at`, and exit 0. The `commit` value is
-stamped into the binary by the Dockerfile from the SHA that CI supplies, which
-is how it is proved that the published image was built from the code you
-submitted. Do not print it yourself, and do not remove the test that checks it.
+```sh
+docker run --rm -p 8080:8080 ghcr.io/alexandrucampan/atad-url-shortener:latest
+```
 
-**The four contract routes are not optional.** `/health`, `/version`, `/` and
-`POST /reset` must answer exactly as the project document specifies, in every
-project. They are checked automatically, and a right answer with the wrong
-status code is a wrong answer.
+## Project details to complete
 
-**Layout.** `cmd/app` is the entry point, `internal/` is your own packages,
-and `docs/` holds your documentation. Add packages under `internal/` as the
-project grows; a single 800-line `main.go` is not a design.
+Before submission, fill in the real group, student ID, and university email in `atad.json` and update the student line above. The project number, title, language, and container command are already filled in `atad.json`.
 
-**`docs/` has fixed names.** `docs/architecture.md` is due in week 7 and
-`docs/report.docx` at the end. `docs/README.md` explains both — read it, and do
-not edit or delete it.
-
-**Do not commit** `coverage/`, build output, or anything with a credential in
-it. `.gitignore` already covers the usual cases.
+The architecture note is in [`docs/architecture.md`](docs/architecture.md). The final report belongs at `docs/report.docx`.
