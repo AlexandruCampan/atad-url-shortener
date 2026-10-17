@@ -19,6 +19,7 @@ import (
 	"syscall"
 	"time"
 
+	"atad-project/internal/shortener"
 	"atad-project/internal/version"
 )
 
@@ -42,6 +43,7 @@ func run() error {
 	log := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 	mux := http.NewServeMux()
+	links := shortener.New()
 
 	// ---- the common contract: four routes, identical in every project -------
 
@@ -57,25 +59,28 @@ func run() error {
 		})
 	})
 
-	// The identity page. Replace the placeholders with your own details; the
-	// marking script reads this page.
+	// The identity page. Add the student and group details before submission.
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintf(w, `<!doctype html><html lang="en"><meta charset="utf-8">
-<title>%s</title><body>
-<h1>%s</h1>
-<p>[Surname Firstname], group [group]</p>
-<p>Project [number]: [title]</p>
-</body></html>`, version.Current().App, version.Current().App)
+		_, _ = fmt.Fprint(w, `<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATAD URL Shortener</title><body style="font: 16px system-ui; max-width: 760px; margin: 3rem auto; padding: 0 1rem; color: #202124">
+<h1>URL Shortener with Analytics</h1>
+<p>ATAD 2026–2027 · Project 1</p>
+<p>Create a short link with POST /links, then open /{code} to redirect.</p>
+<pre>curl -i -H "Content-Type: application/json" -d '{"url":"https://go.dev/doc/effective_go","code":"gofmt"}' http://localhost:8080/links</pre>
+<p>Link list: <a href="/links">GET /links</a> · Health: <a href="/health">GET /health</a></p>
+</body></html>`)
 	})
 
 	// Discards everything the service holds, so tests can start from a known
 	// state without restarting the container. If your project persists data,
 	// this clears what was persisted too.
 	mux.HandleFunc("POST /reset", func(w http.ResponseWriter, r *http.Request) {
-		// TODO: clear your own state here.
+		links.Reset()
 		w.WriteHeader(http.StatusNoContent)
 	})
+	links.Register(mux)
 
 	// ---- your own routes go below -------------------------------------------
 
