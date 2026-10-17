@@ -1,0 +1,13 @@
+# Build artefacts. The repository holds sources, not results.
+/app
+/server
+*.exe
+coverage/
+
+# macOS metadata
+.DS_Store
+
+# Secrets. Never commit credentials.
+.env
+*.pem
+*.key
