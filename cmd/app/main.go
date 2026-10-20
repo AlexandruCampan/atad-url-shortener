@@ -74,7 +74,7 @@ func run() error {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATAD URL Shortener</title><body style="font: 16px system-ui; max-width: 760px; margin: 3rem auto; padding: 0 1rem; color: #202124">
 <h1>URL Shortener with Analytics</h1>
-<p>Student: Campan Alexandru · Group: to be added</p>
+<p>Student: Campan Alexandru · Group: - · Student ID: M374802</p>
 <p>ATAD 2026–2027 · Project 1</p>
 <p>Create a short link with POST /links, then open /{code} to redirect.</p>
 <pre>curl -i -H "Content-Type: application/json" -d '{"url":"https://go.dev/doc/effective_go","code":"gofmt"}' http://localhost:8080/links</pre>

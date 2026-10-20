@@ -1,8 +1,8 @@
 {
   "template": "atad-2026-2027-v1-go",
   "name": "Campan Alexandru",
-  "group": "",
-  "student_id": 0,
+  "group": "-",
+  "student_id": "M374802",
   "email": "alexandru.campan@student.upt.ro",
   "project": 1,
   "project_title": "URL Shortener with Analytics",
