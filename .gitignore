@@ -11,3 +11,6 @@ coverage/
 .env
 *.pem
 *.key
+
+# Local persistent service data
+data/

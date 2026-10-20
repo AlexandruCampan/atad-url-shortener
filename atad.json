@@ -7,5 +7,5 @@
   "project": 1,
   "project_title": "URL Shortener with Analytics",
   "language": "go",
-  "run_command": "docker run --rm -p 8080:8080 ghcr.io/alexandrucampan/atad-url-shortener:latest"
+  "run_command": "docker run --rm -p 8080:8080 -v atad-url-shortener-data:/data ghcr.io/alexandrucampan/atad-url-shortener:latest"
 }

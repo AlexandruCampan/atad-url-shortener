@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -43,7 +44,14 @@ func run() error {
 	log := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 	mux := http.NewServeMux()
-	links := shortener.New()
+	dataFile := strings.TrimSpace(os.Getenv("ATAD_DATA_FILE"))
+	if dataFile == "" {
+		dataFile = "data/links.json"
+	}
+	links, err := shortener.Open(dataFile)
+	if err != nil {
+		return fmt.Errorf("open shortener store: %w", err)
+	}
 
 	// ---- the common contract: four routes, identical in every project -------
 
@@ -66,6 +74,7 @@ func run() error {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATAD URL Shortener</title><body style="font: 16px system-ui; max-width: 760px; margin: 3rem auto; padding: 0 1rem; color: #202124">
 <h1>URL Shortener with Analytics</h1>
+<p>Student: Campan Alexandru · Group: to be added</p>
 <p>ATAD 2026–2027 · Project 1</p>
 <p>Create a short link with POST /links, then open /{code} to redirect.</p>
 <pre>curl -i -H "Content-Type: application/json" -d '{"url":"https://go.dev/doc/effective_go","code":"gofmt"}' http://localhost:8080/links</pre>
@@ -77,7 +86,10 @@ func run() error {
 	// state without restarting the container. If your project persists data,
 	// this clears what was persisted too.
 	mux.HandleFunc("POST /reset", func(w http.ResponseWriter, r *http.Request) {
-		links.Reset()
+		if err := links.Reset(); err != nil {
+			writeError(w, http.StatusInternalServerError, "internal", "could not reset data")
+			return
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 	links.Register(mux)
